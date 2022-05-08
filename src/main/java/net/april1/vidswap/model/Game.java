@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @Document(collection = "vidswap")
@@ -15,8 +15,17 @@ import java.util.List;
 @NoArgsConstructor
 public class Game {
 
+    @Indexed
+    @Field("playlist.id")
+    Integer playlistId;
+    @Field("playlist.name")
+    String name;
+    @Field("playlist.date")
+    String date;
+    @Field("playlist.homeTeam")
+    String homeTeam;
+    @Field("playlist.awayTeam")
+    String awayTeam;
     @Id
     private ObjectId id;
-    private Playlist playlist;
-    private List<TagEvent> tagEvents;
 }
