@@ -5,10 +5,8 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @Repository
-public interface VidswapGameRepository
+public interface GamesRepository
         extends ReactiveMongoRepository<Game, String> {
 
     Mono<Game> findByPlaylistId(Integer playlistId);

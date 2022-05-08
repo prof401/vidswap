@@ -3,7 +3,7 @@ package net.april1.vidswap.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.april1.vidswap.model.Game;
-import net.april1.vidswap.repository.VidswapGameRepository;
+import net.april1.vidswap.repository.GamesRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @RequestMapping("/games")
 public class GamesController {
-    private VidswapGameRepository vidswapRepository;
+    private GamesRepository vidswapRepository;
 
     @GetMapping
     public Flux<Game> getAllGames() {
