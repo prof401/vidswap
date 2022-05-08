@@ -2,22 +2,27 @@ package net.april1.vidswap.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Map;
-
 @Data
-@Document
+@Document(collection = "vidswap")
 @AllArgsConstructor
-@NoArgsConstructor
-public class TagEvent {
+public class Event {
 
     @Field("id")
-    private Integer id;
+    private Integer eventId;
+
+    @Field("startOffset")
     private String startOffset;
+
+    @Field("endOffset")
     private String endOffset;
-    private Map<String, Object> tagResource;
+
+    @Field("tagResource.name")
+    String name;
+
+    //private Map<String, Object> tagResource;
     //private List<Map<String, Object>> tagAttributes;
 }

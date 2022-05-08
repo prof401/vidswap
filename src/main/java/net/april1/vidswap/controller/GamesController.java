@@ -2,7 +2,10 @@ package net.april1.vidswap.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.april1.vidswap.model.Event;
 import net.april1.vidswap.model.Game;
+import net.april1.vidswap.model.GameEvents;
+import net.april1.vidswap.repository.GameEventsRepository;
 import net.april1.vidswap.repository.GamesRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,15 +19,21 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @RequestMapping("/games")
 public class GamesController {
-    private GamesRepository vidswapRepository;
+    private GamesRepository gamesRepository;
+    private GameEventsRepository eventRepository;
 
     @GetMapping
     public Flux<Game> getAllGames() {
-        return vidswapRepository.findAll();
+        return gamesRepository.findAll();
     }
 
     @GetMapping("/{playlistId}")
     public Mono<Game> getGame(@PathVariable Integer playlistId) {
-        return vidswapRepository.findByPlaylistId(playlistId).log();
+        return gamesRepository.findByPlaylistId(playlistId);
+    }
+
+    @GetMapping("{playlistId}/events")
+    public Mono<GameEvents> getAllGameEvents(@PathVariable Integer playlistId) {
+        return eventRepository.findAllByPlaylistId(playlistId).log();
     }
 }
