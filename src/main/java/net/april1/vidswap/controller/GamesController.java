@@ -33,7 +33,14 @@ public class GamesController {
     }
 
     @GetMapping("{playlistId}/events")
-    public Mono<GameEvents> getAllGameEvents(@PathVariable Integer playlistId) {
-        return eventRepository.findAllByPlaylistId(playlistId).log();
+    public Flux<Event> getAllGameEvents(@PathVariable Integer playlistId) {
+        return eventRepository.findAllByPlaylistId(playlistId)
+                .flatMapIterable(GameEvents::getTagEvents);
+    }
+
+    @GetMapping("{playlistId}/events/shots")
+    public Flux<Event> getAllGameShots(@PathVariable Integer playlistId) {
+        return this.getAllGameEvents(playlistId)
+                .filter(e -> e.getName().equalsIgnoreCase("shot"));
     }
 }
