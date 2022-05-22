@@ -12,18 +12,18 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @SpringBootApplication
 public class VidswapApplication extends AbstractReactiveMongoConfiguration {
 
-	public static void main(String[] args) {
-		SpringApplication.run(VidswapApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(VidswapApplication.class, args);
+    }
 
-	@Bean
-	public MongoClient mongoClient() {
-		return MongoClients.create();
-	}
+    @Bean
+    public MongoClient mongoClient() {
+        return MongoClients.create();
+    }
 
-	@Override
-	protected String getDatabaseName() {
-		return "games";
-	}
+    @Override
+    protected String getDatabaseName() {
+        return "games";
+    }
 
 }
