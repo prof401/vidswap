@@ -5,6 +5,9 @@ import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.List;
+import java.util.Map;
+
 @Data
 @Document(collection = "vidswap")
 @AllArgsConstructor
@@ -18,4 +21,6 @@ public class Event {
     private String startOffset;
     @Field("endOffset")
     private String endOffset;
+    @Field("tagAttributes")
+    private List<Map<String, Object>> tagAttributes;
 }
