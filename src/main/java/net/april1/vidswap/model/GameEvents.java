@@ -17,5 +17,5 @@ public class GameEvents {
     @Field("playlist.id")
     Integer playlistId;
 
-    List<Event> tagEvents;
+    List<AbstractEvent> tagEvents;
 }

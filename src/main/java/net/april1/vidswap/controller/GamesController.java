@@ -2,7 +2,7 @@ package net.april1.vidswap.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.april1.vidswap.model.Event;
+import net.april1.vidswap.model.AbstractEvent;
 import net.april1.vidswap.model.Game;
 import net.april1.vidswap.model.GameEvents;
 import net.april1.vidswap.repository.GameEventsRepository;
@@ -33,12 +33,16 @@ public class GamesController {
     }
 
     @GetMapping("{playlistId}/events")
-    public Flux<Event> getAllGameEvents(@PathVariable Integer playlistId) {
+    public Flux<AbstractEvent> getAllGameEvents(@PathVariable Integer playlistId) {
         return eventRepository.findAllByPlaylistId(playlistId).flatMapIterable(GameEvents::getTagEvents);
     }
 
     @GetMapping("{playlistId}/events/shots")
-    public Flux<Event> getAllGameShots(@PathVariable Integer playlistId) {
+    public Flux<AbstractEvent> getAllGameShots(@PathVariable Integer playlistId) {
         return this.getAllGameEvents(playlistId).filter(e -> e.getName().equalsIgnoreCase("shot"));
+    }
+    @GetMapping("{playlistId}/events/test")
+    public Flux<AbstractEvent> getAllGameTest(@PathVariable Integer playlistId) {
+        return this.getAllGameEvents(playlistId).filter(e -> e.getName().equalsIgnoreCase("test"));
     }
 }
