@@ -20,7 +20,7 @@ public class GenericEvent extends AbstractEvent {
         List<Object> tagAttributeList = (List) source.get("tagAttributes");
         for (Object o : tagAttributeList) {
             org.bson.Document attributeDocument = (org.bson.Document) o;
-            tagAttributes.put(attributeDocument.getString("name"), attributeDocument.getString("value"));
+            tagAttributes.put(attributeDocument.getString("name"), attributeDocument.get("value").toString());
         }
     }
 }

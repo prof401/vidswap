@@ -1,5 +1,6 @@
 package net.april1.vidswap.converter;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.april1.vidswap.model.AbstractEvent;
 import net.april1.vidswap.model.GenericEvent;
@@ -10,20 +11,18 @@ import org.springframework.data.convert.ReadingConverter;
 
 
 @ReadingConverter
+@NoArgsConstructor
 @Slf4j
 public class EventReadConverter implements Converter<Document, AbstractEvent> {
-
-    public EventReadConverter() {
-    }
 
     @Override
     public AbstractEvent convert(Document source) {
         String eventName = ((Document) source.get("tagResource")).getString("name");
-        log.info("Converting {} event", eventName);
         switch (eventName) {
             case "Shot":
                 return new ShotEvent(source);
             default:
+                log.info("Converting {} event", eventName);
                 return new GenericEvent(source);
         }
     }
