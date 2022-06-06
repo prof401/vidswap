@@ -6,20 +6,20 @@ import net.april1.vidswap.model.AbstractEvent;
 import net.april1.vidswap.model.Game;
 import net.april1.vidswap.model.GameEvents;
 import net.april1.vidswap.repository.GameEventsRepository;
+import net.april1.vidswap.service.EventService;
 import net.april1.vidswap.service.GameService;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import javax.annotation.Resource;
 
 @RestController
 @Slf4j
 @AllArgsConstructor
 @RequestMapping("/games")
 public class GamesController {
-    private GameEventsRepository eventRepository;
+
     private GameService gameService;
+    private EventService eventService;
 
     @GetMapping
     public Flux<Game> getAllGames() {
@@ -33,16 +33,16 @@ public class GamesController {
 
     @GetMapping("{playlistId}/events")
     public Flux<AbstractEvent> getAllGameEvents(@PathVariable Integer playlistId) {
-        return eventRepository.findAllByPlaylistId(playlistId).flatMapIterable(GameEvents::getTagEvents);
+        return eventService.getEvents(playlistId);
     }
 
     @GetMapping("{playlistId}/events/shots")
     public Flux<AbstractEvent> getAllGameShots(@PathVariable Integer playlistId) {
-        return this.getAllGameEvents(playlistId).filter(e -> e.getName().equalsIgnoreCase("shot"));
+        return eventService.getShots(playlistId);
     }
     @GetMapping("{playlistId}/events/test")
     public Flux<AbstractEvent> getAllGameTest(@PathVariable Integer playlistId) {
-        return this.getAllGameEvents(playlistId).filter(e -> e.getName().equalsIgnoreCase("test"));
+        return eventService.getTest(playlistId);
     }
 
 //    @GetMapping("export")
