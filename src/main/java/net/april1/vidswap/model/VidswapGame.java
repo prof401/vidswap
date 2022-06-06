@@ -15,7 +15,7 @@ import java.util.Optional;
 @Data
 @Document(collection = "vidswap")
 @AllArgsConstructor
-public class Game {
+public class VidswapGame {
 
     @Indexed
     @Field("playlist.id")

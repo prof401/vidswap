@@ -11,11 +11,11 @@ import java.util.List;
 @Data
 @Document(collection = "vidswap")
 @AllArgsConstructor
-public class GameEvents {
+public class VidswapGameTags {
 
     @Indexed
     @Field("playlist.id")
     Integer playlistId;
 
-    List<AbstractEvent> tagEvents;
+    List<VidswapTag> tagEvents;
 }

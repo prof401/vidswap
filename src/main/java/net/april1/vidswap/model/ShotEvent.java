@@ -11,7 +11,7 @@ import java.util.Map;
 @Document(collection = "vidswap")
 @Data
 @Slf4j
-public class ShotEvent extends AbstractEvent {
+public class ShotEvent {
     String teamName;
     String result;
     Double net_x;
@@ -25,7 +25,7 @@ public class ShotEvent extends AbstractEvent {
     private Map<String, String> other = new HashMap<>();
 
     public ShotEvent(org.bson.Document source) {
-        super(source);
+     //   super(source);
 
         List<Object> tagAttributeList = (List) source.get("tagAttributes");
         for (Object o : tagAttributeList) {
