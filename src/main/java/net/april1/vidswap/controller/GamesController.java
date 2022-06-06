@@ -6,30 +6,29 @@ import net.april1.vidswap.model.AbstractEvent;
 import net.april1.vidswap.model.Game;
 import net.april1.vidswap.model.GameEvents;
 import net.april1.vidswap.repository.GameEventsRepository;
-import net.april1.vidswap.repository.GamesRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import net.april1.vidswap.service.GameService;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import javax.annotation.Resource;
 
 @RestController
 @Slf4j
 @AllArgsConstructor
 @RequestMapping("/games")
 public class GamesController {
-    private GamesRepository gamesRepository;
     private GameEventsRepository eventRepository;
+    private GameService gameService;
 
     @GetMapping
     public Flux<Game> getAllGames() {
-        return gamesRepository.findAll();
+        return gameService.getAll();
     }
 
     @GetMapping("/{playlistId}")
     public Mono<Game> getGame(@PathVariable Integer playlistId) {
-        return gamesRepository.findByPlaylistId(playlistId);
+        return gameService.getGame(playlistId);
     }
 
     @GetMapping("{playlistId}/events")
@@ -45,4 +44,18 @@ public class GamesController {
     public Flux<AbstractEvent> getAllGameTest(@PathVariable Integer playlistId) {
         return this.getAllGameEvents(playlistId).filter(e -> e.getName().equalsIgnoreCase("test"));
     }
+
+//    @GetMapping("export")
+//    @ResponseBody
+//    public ResponseEntity<Mono<Resource>> downloadCsv() {
+//        String fileName = String.format("%s.csv", RandomStringUtils.randomAlphabetic(10));
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION,  "attachment; filename=" + fileName)
+//                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+//                .body(csvWriterService.generateCsv()
+//                        .flatMap(x -> {
+//                            Resource resource = new InputStreamResource(x);
+//                            return Mono.just(resource);
+//                        }));
+//    }
 }
