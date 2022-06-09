@@ -28,24 +28,26 @@ public class DataService {
     private GameService gameService;
 
     public Flux<XGData> collectXGData() {
-        return
-                eventService.getShots(464739)
-                        .map(shot -> {
-                            XGData dataPoint = new XGData();
-                            //log.info("tagAttributes {}", shot.getTagAttributes());
-                            for (Map<String, Object> attribute : shot.getTagAttributes()) {
-                                //log.info("id value {} {} ", attribute.get("id"), attribute.get("id").getClass().toString() );
-                                Integer id = (Integer) attribute.get("id");
-                                if (id.equals(ATTRIBUTE_FIELD_LOCATION)) {
-                                    dataPoint.setX(getX((Map<String, Number>) attribute.get("value")));
-                                    dataPoint.setY(getY((Map<String, Number>) attribute.get("value")));
-                                }
-                                if (id.equals(ATTRIBUTE_RESULT)) {
-                                    dataPoint.setGoal("goal".equals(attribute.get("value")));
-                                }
-                            }
-                            return dataPoint;
-                        });
+        return gameService.getAll().flatMap(game -> collectGameXGData(game.getPlaylistId()));
+    }
+
+    private Flux<XGData> collectGameXGData(Integer playlistId) {
+        return eventService.getShots(playlistId).map(shot -> {
+            XGData dataPoint = new XGData();
+            //log.info("tagAttributes {}", shot.getTagAttributes());
+            for (Map<String, Object> attribute : shot.getTagAttributes()) {
+                //log.info("id value {} {} ", attribute.get("id"), attribute.get("id").getClass().toString() );
+                Integer id = (Integer) attribute.get("id");
+                if (id.equals(ATTRIBUTE_FIELD_LOCATION)) {
+                    dataPoint.setX(getX((Map<String, Number>) attribute.get("value")));
+                    dataPoint.setY(getY((Map<String, Number>) attribute.get("value")));
+                }
+                if (id.equals(ATTRIBUTE_RESULT)) {
+                    dataPoint.setGoal("goal".equals(attribute.get("value")));
+                }
+            }
+            return dataPoint;
+        });
 
     }
 
