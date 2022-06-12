@@ -56,8 +56,8 @@ public class GamesController {
     }
 
     @GetMapping("/xgdata/csv")
-    public Mono<ResponseEntity> getXGDataCSV() {
-        return dataService.collectXGData()// return Flux<Foo>
+    public Mono<ResponseEntity<String>> getXGDataCSV() {
+        return dataService.collectXGData()
                 .collectList().map(dataPoint ->
                         ResponseEntity.ok()
                                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=export.csv")
@@ -66,28 +66,13 @@ public class GamesController {
     }
 
     @GetMapping("/xgdata/csv2")
-    public ResponseEntity getXGDataCSV2() {
+    public ResponseEntity<Mono<String>> getXGDataCSV2() {
         CsvMapper mapper = new CsvMapper();
         CsvSchema schema = mapper.schemaFor(XGData.class);
-//        dataService.collectXGData()
-//                .subscribe(dataPoint ->
-//                { log.info("Data point {} " , dataPoint);
-//                return ResponseEntity.ok();});
-//                    try {
-//                        return ResponseEntity.ok()
-//                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=export.csv")
-//                                .body(mapper.writerFor(XGData.class)
-//                                        .with(schema)
-//                                        .writeValueAsString(dataPoint));
-//                    } catch (JsonProcessingException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                });
 
-        return
-                ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=export.csv")
-                        .body(dataService.collectXGData().map(data ->
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=export.csv")
+                .body(dataService.collectXGData().map(data ->
                                         {
                                             try {
                                                 return mapper.writerFor(XGData.class)
@@ -99,6 +84,6 @@ public class GamesController {
                                         }
                                 )
                                 .reduce("", String::concat)
-                        );
+                );
     }
 }

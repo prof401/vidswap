@@ -3,7 +3,6 @@ package net.april1.vidswap.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.april1.vidswap.model.Event;
-import net.april1.vidswap.model.VidswapTag;
 import net.april1.vidswap.model.VidswapGameTags;
 import net.april1.vidswap.repository.GameEventsRepository;
 import org.springframework.stereotype.Service;

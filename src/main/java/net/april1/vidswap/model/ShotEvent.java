@@ -25,9 +25,9 @@ public class ShotEvent {
     private Map<String, String> other = new HashMap<>();
 
     public ShotEvent(org.bson.Document source) {
-     //   super(source);
+        //   super(source);
 
-        List<Object> tagAttributeList = (List) source.get("tagAttributes");
+        List<Object> tagAttributeList = (List<Object>) source.get("tagAttributes");
         for (Object o : tagAttributeList) {
             org.bson.Document attributeDocument = (org.bson.Document) o;
             var attributeName = attributeDocument.getString("name");
