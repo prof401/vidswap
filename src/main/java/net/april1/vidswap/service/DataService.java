@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.april1.vidswap.model.XGData;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -26,6 +27,13 @@ public class DataService {
 
     private EventService eventService;
     private GameService gameService;
+
+    public Mono<Void> exportXGData() {
+        this.collectXGData()
+                .subscribe(dp -> log.info("data {}", dp));
+
+        return Mono.empty();
+    }
 
     public Flux<XGData> collectXGData() {
         return gameService.getAll().flatMap(game -> collectGameXGData(game.getPlaylistId()));
