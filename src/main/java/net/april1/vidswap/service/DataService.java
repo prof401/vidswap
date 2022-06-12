@@ -28,20 +28,15 @@ public class DataService {
     private EventService eventService;
     private GameService gameService;
 
-    public Mono<Void> exportXGData() {
-        this.collectXGData()
-                .subscribe(dp -> log.info("data {}", dp));
-
-        return Mono.empty();
-    }
-
     public Flux<XGData> collectXGData() {
         return gameService.getAll().flatMap(game -> collectGameXGData(game.getPlaylistId()));
     }
 
     private Flux<XGData> collectGameXGData(Integer playlistId) {
-        return eventService.getShots(playlistId).map(shot -> {
+        return eventService.getShots(playlistId).mapNotNull(shot -> {
             XGData dataPoint = new XGData();
+            boolean location = false;
+            boolean result = false;
             //log.info("tagAttributes {}", shot.getTagAttributes());
             for (Map<String, Object> attribute : shot.getTagAttributes()) {
                 //log.info("id value {} {} ", attribute.get("id"), attribute.get("id").getClass().toString() );
@@ -49,11 +44,14 @@ public class DataService {
                 if (id.equals(ATTRIBUTE_FIELD_LOCATION)) {
                     dataPoint.setX(getX((Map<String, Number>) attribute.get("value")));
                     dataPoint.setY(getY((Map<String, Number>) attribute.get("value")));
+                    location=true;
                 }
                 if (id.equals(ATTRIBUTE_RESULT)) {
                     dataPoint.setGoal("goal".equals(attribute.get("value")));
+                    result=true;
                 }
             }
+            if(!location || !result) return null; //if missing data do not include
             return dataPoint;
         });
 
