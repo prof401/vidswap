@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.Map;
 
 @Service
@@ -35,6 +36,8 @@ public class DataService {
     private Flux<XGData> collectGameXGData(Integer playlistId) {
         return eventService.getShots(playlistId).mapNotNull(shot -> {
             XGData dataPoint = new XGData();
+            dataPoint.setPlaylistId(playlistId);
+            dataPoint.setStartOffset(shot.getStartOffset());
             boolean location = false;
             boolean result = false;
             //log.info("tagAttributes {}", shot.getTagAttributes());
@@ -53,7 +56,7 @@ public class DataService {
             }
             if(!location || !result) return null; //if missing data do not include
             return dataPoint;
-        });
+        }).sort(Comparator.comparing(XGData::getPlaylistId).thenComparing(XGData::getStartOffset));
 
     }
 
