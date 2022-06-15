@@ -23,4 +23,7 @@ public class XGData {
     boolean goal;
     int playlistId;
     String startOffset;
+    String home;
+    String away;
+    String shotTeam;
 }
