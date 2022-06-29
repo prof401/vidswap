@@ -2,6 +2,7 @@ package net.april1.vidswap.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.april1.vidswap.model.Event;
 import net.april1.vidswap.model.VidswapGame;
 import net.april1.vidswap.model.XGData;
 import org.springframework.data.annotation.Transient;
@@ -33,7 +34,7 @@ public class DataService {
   private GameService gameService;
 
   @Transient
-  private Set<String> teamNameSet = new HashSet<>();
+  private Set<String> teamNameSet;
 
   public Flux<XGData> collectXGData() {
     return gameService.getAll().flatMap(this::collectGameXGData);
@@ -41,11 +42,7 @@ public class DataService {
 
   private Flux<XGData> collectGameXGData(VidswapGame game) {
     return eventService.getShots(game.getPlaylistId()).mapNotNull(shot -> {
-      XGData dataPoint = new XGData();
-      dataPoint.setPlaylistId(game.getPlaylistId());
-      dataPoint.setStartOffset(shot.getStartOffset());
-      dataPoint.setHome(decodeTeam(game.getHomeTeam()));
-      dataPoint.setAway(decodeTeam(game.getAwayTeam()));
+      XGData dataPoint = getInitialXgData(game, shot);
       boolean location = false;
       boolean result = false;
       log.debug("tagAttributes {}", shot.getTagAttributes());
@@ -53,13 +50,7 @@ public class DataService {
         log.debug("id value {} {}", attribute.get("id"), attribute.get("id").getClass().toString());
         Integer id = (Integer) attribute.get("id");
         if (id.equals(ATTRIBUTE_FIELD_LOCATION)) {
-          double localX = getX((Map<String, Number>) attribute.get(VALUE_ATTRIBUTE));
-          double localY = getY((Map<String, Number>) attribute.get(VALUE_ATTRIBUTE));
-          dataPoint.setX(localX + 40.0);
-          dataPoint.setY(localY);
-          dataPoint.setTheta(calcTheta(localX, localY));
-          dataPoint.setDistanceCenter(calcDCenter(localX, localY));
-          dataPoint.setDistanceLine(calcDLine(localX, localY));
+          setFieldLocationData(dataPoint, attribute);
           location = true;
         }
         if (id.equals(ATTRIBUTE_RESULT)) {
@@ -76,6 +67,25 @@ public class DataService {
       return dataPoint;
     }).sort(Comparator.comparing(XGData::getPlaylistId).thenComparing(XGData::getStartOffset));
 
+  }
+
+  private XGData getInitialXgData(VidswapGame game, Event shot) {
+    XGData dataPoint = new XGData();
+    dataPoint.setPlaylistId(game.getPlaylistId());
+    dataPoint.setStartOffset(shot.getStartOffset());
+    dataPoint.setHome(decodeTeam(game.getHomeTeam()));
+    dataPoint.setAway(decodeTeam(game.getAwayTeam()));
+    return dataPoint;
+  }
+
+  private void setFieldLocationData(XGData dataPoint, Map<String, Object> attribute) {
+    double localX = getX((Map<String, Number>) attribute.get(VALUE_ATTRIBUTE));
+    double localY = getY((Map<String, Number>) attribute.get(VALUE_ATTRIBUTE));
+    dataPoint.setX(localX + 40.0);
+    dataPoint.setY(localY);
+    dataPoint.setTheta(calcTheta(localX, localY));
+    dataPoint.setDistanceCenter(calcDCenter(localX, localY));
+    dataPoint.setDistanceLine(calcDLine(localX, localY));
   }
 
   private double getX(Map<String, Number> fieldLocationMap) {

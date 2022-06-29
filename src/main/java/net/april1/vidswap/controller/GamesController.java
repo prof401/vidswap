@@ -65,6 +65,12 @@ public class GamesController {
                 );
     }
 
+    @GetMapping("/xgdata/ccc")
+    public Flux<XGData> getXGDataCcc() {
+        return getXGData()
+            .filter(XGData::isConference);
+    }
+
     @GetMapping("/xgdata/csv2")
     public ResponseEntity<Mono<String>> getXGDataCSV2() {
         CsvMapper mapper = new CsvMapper();

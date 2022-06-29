@@ -1,6 +1,7 @@
 package net.april1.vidswap.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.beans.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,4 +33,9 @@ public class XGData {
   String home;
   String away;
   String shotTeam;
+
+  @Transient
+  public boolean isConference() {
+    return home.equals(home.toUpperCase()) && away.equals(away.toUpperCase());
+  }
 }
