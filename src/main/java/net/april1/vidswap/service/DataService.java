@@ -42,31 +42,37 @@ public class DataService {
 
   private Flux<XGData> collectGameXGData(VidswapGame game) {
     return eventService.getShots(game.getPlaylistId()).mapNotNull(shot -> {
-      XGData dataPoint = getInitialXgData(game, shot);
-      boolean location = false;
-      boolean result = false;
-      log.debug("tagAttributes {}", shot.getTagAttributes());
-      for (Map<String, Object> attribute : shot.getTagAttributes()) {
-        log.debug("id value {} {}", attribute.get("id"), attribute.get("id").getClass().toString());
-        Integer id = (Integer) attribute.get("id");
-        if (id.equals(ATTRIBUTE_FIELD_LOCATION)) {
-          setFieldLocationData(dataPoint, attribute);
-          location = true;
-        }
-        if (id.equals(ATTRIBUTE_RESULT)) {
-          dataPoint.setGoal("goal".equals(attribute.get(VALUE_ATTRIBUTE)));
-          result = true;
-        }
-        if (id.equals(ATTRIBUTE_SHOT)) {
-          dataPoint.setShotTeam(decodeTeam((String) attribute.get(VALUE_ATTRIBUTE)));
-        }
-      }
-      if (!location || !result) {
-        return null; //if missing data do not include
-      }
-      return dataPoint;
+      return getXgData(game, shot);
     }).sort(Comparator.comparing(XGData::getPlaylistId).thenComparing(XGData::getStartOffset));
 
+  }
+
+  private XGData getXgData(VidswapGame game, Event shot) {
+    XGData dataPoint = getInitialXgData(game, shot);
+    boolean location = false;
+    boolean result = false;
+    log.debug("tagAttributes {}", shot.getTagAttributes());
+    for (Map<String, Object> attribute : shot.getTagAttributes()) {
+      log.debug("id value {} {}", attribute.get("id"), attribute.get("id").getClass().toString());
+      Integer id = (Integer) attribute.get("id");
+      if (id.equals(ATTRIBUTE_FIELD_LOCATION)) {
+        setFieldLocationData(dataPoint, attribute);
+        location = true;
+      }
+      if (id.equals(ATTRIBUTE_RESULT)) {
+        dataPoint.setGoal("goal".equals(attribute.get(VALUE_ATTRIBUTE)));
+        result = true;
+      }
+      if (id.equals(ATTRIBUTE_SHOT)) {
+        dataPoint.setShotTeam(decodeTeam((String) attribute.get(VALUE_ATTRIBUTE)));
+      }
+    }
+    if (!location || !result) {
+      //did not find all the data, do not return record
+      return null;
+    }
+
+    return dataPoint;
   }
 
   private XGData getInitialXgData(VidswapGame game, Event shot) {
