@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
+
 @RestController
 @Slf4j
 @AllArgsConstructor
@@ -35,6 +37,11 @@ public class GamesController {
         return gameService.getAll();
     }
 
+    @GetMapping("/events")
+    public Flux<Event> getALlEvents() {
+        return eventService.getALlEvents().sort(Comparator.comparing(Event::getName));
+    }
+
     @GetMapping("/{playlistId}")
     public Mono<VidswapGame> getGame(@PathVariable Integer playlistId) {
         return gameService.getGame(playlistId);
@@ -46,9 +53,15 @@ public class GamesController {
     }
 
     @GetMapping("/{playlistId}/events/shots")
-    public Flux<Event> getAllGameShots(@PathVariable Integer playlistId) {
+    public Flux<Event> getGameShots(@PathVariable Integer playlistId) {
         return eventService.getShots(playlistId);
     }
+
+    @GetMapping("/{playlistId}/events/periods")
+    public Flux<Event> getGamePeriods(@PathVariable Integer playlistId) { return eventService.getPeriods(playlistId); }
+
+    @GetMapping("/{playlistId}/events/setpieces")
+    public Flux<Event> getGameSetPieces(@PathVariable Integer playlistId) { return eventService.getSetPieces(playlistId); }
 
     @GetMapping("/xgdata")
     public Flux<XGData> getXGData() {
@@ -68,7 +81,7 @@ public class GamesController {
     @GetMapping("/xgdata/ccc")
     public Flux<XGData> getXGDataCcc() {
         return getXGData()
-            .filter(XGData::isConference);
+                .filter(XGData::isConference);
     }
 
     @GetMapping("/xgdata/csv2")

@@ -12,8 +12,12 @@ import reactor.core.publisher.Flux;
 @Slf4j
 @AllArgsConstructor
 public class EventService {
-
+    private GameService gameService;
     private GameEventsRepository eventRepository;
+
+    public Flux<Event>getALlEvents() {
+        return gameService.getAll().flatMap(game -> getEvents(game.getPlaylistId()));
+    }
 
     public Flux<Event> getEvents(Integer playlistId) {
         return eventRepository.findAllByPlaylistId(playlistId)
@@ -23,5 +27,13 @@ public class EventService {
 
     public Flux<Event> getShots(Integer playlistId) {
         return getEvents(playlistId).filter(e -> e.getName().equalsIgnoreCase("shot"));
+    }
+
+    public Flux<Event> getPeriods(Integer playlistId) {
+        return getEvents(playlistId).filter(e -> e.getName().equalsIgnoreCase("Period"));
+    }
+
+    public Flux<Event> getSetPieces(Integer playlistId) {
+        return getEvents(playlistId).filter(e -> e.getName().equalsIgnoreCase("Set Piece"));
     }
 }
