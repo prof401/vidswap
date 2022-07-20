@@ -65,12 +65,17 @@ public class GamesController {
 
     @GetMapping("/xgdata")
     public Flux<XGData> getXGData() {
-        return dataService.collectXGData();
+        return dataService.collectAllXGData();
+    }
+
+    @GetMapping("/xgdata/{playlistId}")
+    public Flux<XGData> getXGData(@PathVariable Integer playlistId) {
+        return dataService.collectSingleXGData(playlistId);
     }
 
     @GetMapping("/xgdata/csv")
     public Mono<ResponseEntity<String>> getXGDataCSV() {
-        return dataService.collectXGData()
+        return dataService.collectAllXGData()
                 .collectList().map(dataPoint ->
                         ResponseEntity.ok()
                                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=export.csv")
@@ -91,7 +96,7 @@ public class GamesController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=export.csv")
-                .body(dataService.collectXGData().map(data ->
+                .body(dataService.collectAllXGData().map(data ->
                                         {
                                             try {
                                                 return mapper.writerFor(XGData.class)

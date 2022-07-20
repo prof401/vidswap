@@ -9,6 +9,8 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -16,6 +18,7 @@ import java.util.*;
 @AllArgsConstructor
 public class DataService {
 
+  public static final DateTimeFormatter PARSE_FORMAT = DateTimeFormatter.ofPattern("H:mm:ss.nnnnnn");
   private static final Integer ATTRIBUTE_FIELD_LOCATION = 4291;
   private static final Integer ATTRIBUTE_RESULT = 789;
   private static final Integer ATTRIBUTE_SHOT = 1273;
@@ -36,15 +39,31 @@ public class DataService {
   @Transient
   private Set<String> teamNameSet;
 
-  public Flux<XGData> collectXGData() {
-    return gameService.getAll().flatMap(this::collectGameXGData);
+  public Flux<XGData> collectAllXGData() {
+    return gameService.getAll()
+            .flatMap(game -> {
+            return collectGameXGData(game);})
+            .sort(Comparator.comparing(XGData::getPlaylistId));
+  }
+
+  public Flux<XGData> collectSingleXGData(Integer playlistId) {
+    return gameService.getGame(playlistId)
+            .flatMapMany(game -> {
+              return collectGameXGData(game);})
+            .sort(Comparator.comparing(XGData::getPlaylistId));
   }
 
   private Flux<XGData> collectGameXGData(VidswapGame game) {
-    return eventService.getShots(game.getPlaylistId()).mapNotNull(shot -> {
-      return getXgData(game, shot);
-    }).sort(Comparator.comparing(XGData::getPlaylistId).thenComparing(XGData::getStartOffset));
+    var periods = getPeriodArray(game);
+    return eventService.getShots(game.getPlaylistId())
+            .mapNotNull(shot -> getXgData(game, shot))
+            .sort(Comparator.comparing(XGData::getVideoTime));
+  }
 
+  private Flux<LocalTime> getPeriodArray(VidswapGame game) {
+    return eventService.getPeriods(game.getPlaylistId())
+            .sort(Comparator.comparing(Event::getStartOffset))
+            .map(event -> { return LocalTime.parse(event.getStartOffset(), PARSE_FORMAT);});
   }
 
   private XGData getXgData(VidswapGame game, Event shot) {
@@ -78,7 +97,10 @@ public class DataService {
   private XGData getInitialXgData(VidswapGame game, Event shot) {
     XGData dataPoint = new XGData();
     dataPoint.setPlaylistId(game.getPlaylistId());
-    dataPoint.setStartOffset(shot.getStartOffset());
+    LocalTime gameTime = LocalTime.parse(shot.getStartOffset(), PARSE_FORMAT);
+    dataPoint.setPeriod(0);
+    int period =  0;
+    dataPoint.setVideoTime(gameTime);
     dataPoint.setHome(decodeTeam(game.getHomeTeam()));
     dataPoint.setAway(decodeTeam(game.getAwayTeam()));
     return dataPoint;
