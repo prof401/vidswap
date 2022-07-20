@@ -174,6 +174,12 @@ public class DataService {
         return "SOUTHERNOREGON";
       case "warner pacific":
         return "WARNERPACIFIC";
+      case "boise state":
+      case "boise state university":
+        return "bsu";
+      case "northwest nazarene":
+      case "northwest nazarene university":
+        return "nnu";
       default:
         if (!teamNameSet.contains(teamName)) {
           log.info("Missing team {}", teamName);
